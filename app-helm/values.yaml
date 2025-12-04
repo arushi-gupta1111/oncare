@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: 15121993/app  # Replace with your Docker Hub repo
-  tag: "1.0"
+  tag: "latest"
   pullPolicy: IfNotPresent
 
 service:
