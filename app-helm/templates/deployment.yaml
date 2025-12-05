@@ -16,11 +16,11 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: NODE_ENV
-              value: {{ .Values.env.NODE_ENV | quote }}
-            - name: PORT
-              value: {{ .Values.env.PORT | quote }}
+            #env:
+            #- name: NODE_ENV
+            #  value: {{ .Values.env.NODE_ENV | quote }}
+            #- name: PORT
+            #  value: {{ .Values.env.PORT | quote }}
           envFrom:
             - configMapRef:
                 name: {{ include "app-helm.fullname" . }}-config

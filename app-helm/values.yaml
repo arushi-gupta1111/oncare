@@ -3,7 +3,7 @@ replicaCount: 2
 image:
   repository: 15121993/app  # Replace with your Docker Hub repo
   tag: "latest"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   type: ClusterIP
@@ -18,10 +18,8 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls: []
-
-config:
-  appMessage: "Hello from ConfigMap"
+        - path: /health
+          pathType: Prefix
 
 autoscaling:
   enabled: true
