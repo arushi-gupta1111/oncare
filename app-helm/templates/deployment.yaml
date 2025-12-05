@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: {{ include "app-helm.name" . }}
+      annotations:
+        helm.sh/release-time: "{{ now | quote }}"
     spec:
       containers:
         - name: {{ .Chart.Name }}
