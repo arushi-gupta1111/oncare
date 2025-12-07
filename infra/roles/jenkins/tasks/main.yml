@@ -1,66 +1,70 @@
 ---
-- name: Install openjdk-21-jre (required for Jenkins)
-  apt:
-    name: openjdk-21-jre
-    state: present
-    update_cache: yes
+- name: Install Jenkins and configure Docker access
+  hosts: all
+  become: yes
+  tasks:
 
-- name: Ensure /etc/apt/keyrings exists
-  file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: '0755'
+    - name: Install openjdk-21-jre (required for Jenkins)
+      apt:
+        name: openjdk-21-jre
+        state: present
+        update_cache: yes
 
-- name: Remove old Jenkins sources and keys
-  file:
-    path: "{{ item }}"
-    state: absent
-  loop:
-    - /etc/apt/sources.list.d/jenkins.list
-    - /etc/apt/keyrings/jenkins.asc
+    - name: Ensure /etc/apt/keyrings exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
 
-- name: Download Jenkins GPG key
-  get_url:
-    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-    dest: /etc/apt/keyrings/jenkins.asc
-    mode: '0644'
+    - name: Remove old Jenkins sources and keys
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/apt/sources.list.d/jenkins.list
+        - /etc/apt/keyrings/jenkins.asc
 
-- name: Add Jenkins repository (modern, signed-by)
-  shell: |
-    echo "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian-stable binary/" | tee /etc/apt/sources.list.d/jenkins.list
-  args:
-    creates: /etc/apt/sources.list.d/jenkins.list
+    - name: Download Jenkins GPG key
+      get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        dest: /etc/apt/keyrings/jenkins.asc
+        mode: '0644'
 
-- name: Update apt cache
-  apt:
-    update_cache: yes
+    - name: Add Jenkins repository (modern, signed-by)
+      shell: |
+        echo "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian-stable binary/" | tee /etc/apt/sources.list.d/jenkins.list
+      args:
+        creates: /etc/apt/sources.list.d/jenkins.list
 
-- name: Install Jenkins
-  apt:
-    name:
-      - openjdk-21-jre
-      - jenkins
-    state: present
-    
-- name: Ensure Jenkins service is enabled and started
-  systemd:
-    name: jenkins
-    enabled: yes
-    state: started
-    
-- name: Ensure docker group exists
-  group:
-	  name: docker
-	  state: present
+    - name: Update apt cache
+      apt:
+        update_cache: yes
 
-- name: Add Jenkins user to docker group
-  user:
-    name: jenkins
-	  groups: docker
-	  append: yes
+    - name: Install Jenkins
+      apt:
+        name:
+          - openjdk-21-jre
+          - jenkins
+        state: present
 
-- name: Restart Jenkins service
-  service:
-	  name: jenkins
-	  state: restarted
+    - name: Ensure Jenkins service is enabled and started
+      systemd:
+        name: jenkins
+        enabled: yes
+        state: started
 
+    - name: Ensure docker group exists
+      group:
+        name: docker
+        state: present
+
+    - name: Add Jenkins user to docker group
+      user:
+        name: jenkins
+        groups: docker
+        append: yes
+
+    - name: Restart Jenkins service
+      service:
+        name: jenkins
+        state: restarted
