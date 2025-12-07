@@ -85,13 +85,6 @@
 
 - name: Apply sysctl params
   command: sysctl --system
-  
-- name: Install bridge-utils
-  become: yes
-  ansible.builtin.apt:
-    name: bridge-utils
-    state: present
-    update_cache: yes
 
 - name: Install Kube Flannel network plugin as devops user
   become: yes
