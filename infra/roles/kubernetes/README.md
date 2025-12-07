@@ -1,38 +1,26 @@
-Role Name
-=========
+# Kubernetes and Helm Installation Role
+This Ansible role automates the installation of Kubernetes tools (`kubeadm`, `kubelet`, `kubectl`) and Helm on Debian/Ubuntu-based systems, including adding the Kubernetes APT repository and holding package versions.
 
-A brief description of the role goes here.
+## Role Tasks Overview
+The role performs the following tasks:
 
-Requirements
-------------
+1. **Create Kubernetes keyring directory** - Ensures `/etc/apt/keyrings` exists with proper permissions.
+2. **Download Kubernetes GPG key** - Downloads the official GPG key for the Kubernetes repository.
+3. **Add Kubernetes APT repository** - Adds the stable Kubernetes APT repository using the downloaded key.
+4. **Install Kubernetes tools** - Installs `kubeadm`, `kubelet`, and `kubectl`.
+5. **Hold Kubernetes packages** - Prevents automatic updates for installed Kubernetes packages.
+6. **Install Helm** - Installs Helm using the official Helm installation script.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Requirements
+- Ansible 2.9 or later
+- Debian/Ubuntu-based system
+- `curl` installed on the target machine
 
-Role Variables
---------------
+## Usage
+Example playbook using this role:
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```yaml
+- hosts: k8s-nodes
+  become: yes
+  roles:
+    - kubernetes-helm-install
