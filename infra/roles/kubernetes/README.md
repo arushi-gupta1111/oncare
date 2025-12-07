@@ -13,7 +13,7 @@ The role performs the following tasks:
 
 ## Requirements
 - Ansible 2.9 or later
-- Debian/Ubuntu-based system
+- Ubuntu-based system
 - `curl` installed on the target machine
 
 ## Usage
