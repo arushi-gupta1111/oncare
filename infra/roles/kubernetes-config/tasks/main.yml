@@ -114,15 +114,10 @@
   args:
     executable: /bin/bash
 
-- name: Check if ingress-nginx namespace exists
-  kubernetes.core.k8s_info:
-    kind: Namespace
-    name: ingress-nginx
-  register: ingress_ns
-
-- name: Install NGINX Ingress Controller (Bare Metal / Generic Kubernetes)
-  kubernetes.core.k8s:
-    state: present
-    src: https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/baremetal/deploy.yaml
-  when: ingress_ns.resources | length == 0
-
+- name: Check if ingress-nginx already installed if not then install it
+  become: yes
+  shell: |
+    kubectl get ns ingress-nginx >/dev/null 2>&1 --kubeconfig /etc/kubernetes/admin.conf || \
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/baremetal/deploy.yaml --kubeconfig /etc/kubernetes/admin.conf
+  args:
+    executable: /bin/bash
