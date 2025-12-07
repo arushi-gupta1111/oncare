@@ -32,6 +32,7 @@
       - gnupg
       - ufw
       - bridge-utils
+      - groovy
     state: present
 - name: Create deploy user
   user:
