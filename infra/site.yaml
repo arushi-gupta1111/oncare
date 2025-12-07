@@ -8,3 +8,4 @@
     - docker
     - kubernetes
     - jenkins
+    - kubernetes-config
