@@ -1,4 +1,4 @@
 ---
-kubernetes_version: "1.34.0"
+kubernetes_version: "1.34"
 pod_network_cidr: "10.244.0.0/16"
 docker_cgroup_driver: "systemd"
