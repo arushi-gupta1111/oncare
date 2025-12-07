@@ -35,7 +35,7 @@ automated-infra-setup-kubernetes-main/
 |       ├── hpa.yaml               # horizontal pod autoscaling from 2 to 5
 |       ├── ingress.yaml           # ingress rule for / and /health path
 |       ├── service.yaml           # clusterIP service for the pod
-├── JenkinsPipeline/               # Jenkinsfile for CI/CD pipeline
+├── JenkinsPipeline                # Jenkinsfile for CI/CD pipeline
 └── README.md
 ```
 
@@ -126,7 +126,7 @@ helm upgrade demo-app app-helm/
 
 # Part 4 — Jenkins CI/CD Pipeline
 
-A fully automated CI/CD pipeline is included in `JenkinsPipeline/Jenkinsfile`.
+A fully automated CI/CD pipeline is included in `JenkinsPipeline`.
 
 ### Pipeline Stages
 
@@ -170,7 +170,7 @@ helm upgrade --install demo-app app-helm/ --set image.tag=$BUILD_NUMBER
 2. Docker + Kubernetes + Jenkins installed  
 3. Jenkins builds image → runs healthcheck → pushes to DockerHub  
 4. Jenkins deploys application via Helm  
-5. Kubernetes scales with HPA  
-6. Secrets managed securely (Vault or K8s Secrets)
+5. PODs scales with HPA  
+6. Secrets managed securely (K8s Secrets)
 
 ---
