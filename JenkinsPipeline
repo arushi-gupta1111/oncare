@@ -1,0 +1,94 @@
+pipeline {
+    agent any
+
+    environment {
+        // Git commit SHA as version tag
+        GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+        IMAGE_TAG = "${GIT_COMMIT_SHORT}"
+        IMAGE_NAME = "15121993/app"
+
+        // Kubernetes namespace and Helm release
+        K8S_NAMESPACE = "default"
+        HELM_RELEASE = "app"
+        HELM_CHART_PATH = "app-helm"
+
+        // Docker credentials from Kubernetes secret
+        DOCKER_USERNAME = sh(script: "kubectl get secret dockerhub-creds -o jsonpath='{.data.username}' | base64 --decode", returnStdout: true).trim()
+        DOCKER_PASSWORD = sh(script: "kubectl get secret dockerhub-creds -o jsonpath='{.data.password}' | base64 --decode", returnStdout: true).trim()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', 
+                    url: 'https://github.com/arushi-gupta1111/oncare.git',
+                    credentialsId: 'github-credentials'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}", "app")
+                }
+            }
+        }
+
+        stage('Test Docker Image') {
+            steps {
+                script {
+                    // Run container in detached mode
+                    sh "docker run -d --name test-app -p 3000:3000 ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "sleep 5" // wait for server to start
+                    // Test health endpoint
+                    sh "curl -f http://localhost:3000/health || (docker logs test-app && exit 1)"
+                    // Stop and remove container
+                    sh "docker stop test-app && docker rm test-app"
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    try {
+                        sh """
+                        helm upgrade --install ${HELM_RELEASE} ${HELM_CHART_PATH} \
+                          --namespace ${K8S_NAMESPACE} \
+                          --set image.repository=${IMAGE_NAME} \
+                          --set image.tag=${IMAGE_TAG}
+                        """
+                        echo "Deployment successful"
+                    } catch (err) {
+                        echo "Deployment failed. Rolling back..."
+                        sh "helm rollback ${HELM_RELEASE} --namespace ${K8S_NAMESPACE}"
+                        error "Deployment failed, rollback executed"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up workspace...'
+            cleanWs()
+        }
+    }
+}
