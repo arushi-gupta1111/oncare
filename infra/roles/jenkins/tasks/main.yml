@@ -4,7 +4,29 @@
     name: openjdk-21-jre
     state: present
     update_cache: yes
+- name: Find installed Java path
+  command: readlink -f /usr/bin/java
+  register: java_path_raw
 
+- name: Extract JAVA_HOME
+  set_fact:
+    java_home: "{{ java_path_raw.stdout | regex_replace('/bin/java', '') }}"
+
+- name: Set JAVA_HOME system-wide
+  copy:
+    dest: /etc/profile.d/java_home.sh
+    mode: '0755'
+    content: |
+      export JAVA_HOME={{ java_home }}
+      export PATH=$JAVA_HOME/bin:$PATH
+
+- name: Ensure /usr/lib/jvm/default-java points to correct Java
+  file:
+    src: "{{ java_home }}"
+    dest: /usr/lib/jvm/default-java
+    state: link
+    force: yes
+    
 - name: Ensure /etc/apt/keyrings exists
   file:
     path: /etc/apt/keyrings
