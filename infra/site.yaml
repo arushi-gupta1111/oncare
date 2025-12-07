@@ -1,3 +1,5 @@
+# Run roles on all servers in the list with elevated privileges to set up Docker, Kubernetes, and Jenkins.
+# Also perform common steps like package updates, disable swap, open ports
 - hosts: servers
   become: true
 
