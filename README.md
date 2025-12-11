@@ -86,12 +86,15 @@ docker build -t sample-app .
 docker run -p 3000:3000 sample-app
 curl localhost:3000/health
 ```
-### After Successful Image Test Push the docker Image to Docker Hub using docker Hub login credentials in K8 secrets and tag is created based on the Git commit SHA
-
+### After Successful Image Test, Push the docker Image to Docker Hub using docker Hub login credentials in K8 secrets and tag is created based on the Git commit SHA
+### Use below command to set up dockerhub Creds
 ```
-kubectl create secret generic dockerhub-creds   --from-literal=username=15121993   --from-literal=password=xyz   --namespace default
+kubectl create secret generic dockerhub-creds --from-literal=username=15121993 --from-literal=password=xyz --namespace default
+```
+### Assign username and password variable in the pipeline using below command
+```
 DOCKER_USERNAME = sh(script: "kubectl get secret dockerhub-creds -o jsonpath='{.data.username}' | base64 --decode", returnStdout: true).trim()
-        DOCKER_PASSWORD = sh(script: "kubectl get secret dockerhub-creds -o jsonpath='{.data.password}' | base64 --decode", returnStdout: true).trim()
+DOCKER_PASSWORD = sh(script: "kubectl get secret dockerhub-creds -o jsonpath='{.data.password}' | base64 --decode", returnStdout: true).trim()
 ```
 ---
 
