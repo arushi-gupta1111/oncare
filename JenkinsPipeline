@@ -18,7 +18,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main', 
-                    url: 'https://github.com/arushi-gupta1111/oncare.git',
+                    url: 'https://github.com/arushi-gupta1111/automated-infra-setup-kubernetes.git',
                     credentialsId: 'github-credentials'
             }
         }
