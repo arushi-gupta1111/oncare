@@ -14,7 +14,7 @@ ingress:
   enabled: true
   className: nginx
   hosts:
-    - host: ec2-56-228-42-104.eu-north-1.compute.amazonaws.com            # Replace with your hostname
+    - host: ec2-13-53-132-226.eu-north-1.compute.amazonaws.com            # Replace with your hostname
       paths:
         - path: /
           pathType: Prefix
