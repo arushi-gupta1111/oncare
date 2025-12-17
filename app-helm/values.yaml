@@ -28,5 +28,5 @@ autoscaling:
   targetCPUUtilizationPercentage: 70
 
 env:
-  NODE_ENV: production
+  NODE_ENV: staging
   PORT: "3000"
